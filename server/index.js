@@ -1,4 +1,5 @@
 import express from "express";
+import { randomUUID as nodeRandomUUID } from "node:crypto";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import {
@@ -16,6 +17,10 @@ const app = express();
 const port = Number(process.env.PORT ?? 8787);
 
 app.use(express.json({ limit: "1mb" }));
+
+function createUuid() {
+  return globalThis.crypto?.randomUUID?.() ?? nodeRandomUUID();
+}
 
 function resolveCompareRequest(body) {
   const prompt = String(body.prompt ?? "").trim();
@@ -251,7 +256,7 @@ app.post("/api/compare", async (req, res, next) => {
       return;
     }
 
-    const conversationId = existingRecord?.id ?? crypto.randomUUID();
+    const conversationId = existingRecord?.id ?? createUuid();
     const startedAt = Date.now();
     const results = await Promise.all(
       selectedEntries.map((entry) =>
@@ -264,7 +269,7 @@ app.post("/api/compare", async (req, res, next) => {
       )
     );
     const turn = buildTurn({
-      id: crypto.randomUUID(),
+      id: createUuid(),
       prompt,
       selectedEntries,
       results,
@@ -298,8 +303,8 @@ app.post("/api/compare/stream", async (req, res, next) => {
   }
 
   const startedAt = Date.now();
-  const recordId = existingRecord?.id ?? crypto.randomUUID();
-  const turnId = crypto.randomUUID();
+  const recordId = existingRecord?.id ?? createUuid();
+  const turnId = createUuid();
   const turnCreatedAt = new Date().toISOString();
   let clientClosed = false;
   const abortController = new AbortController();
