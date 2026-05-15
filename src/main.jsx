@@ -42,6 +42,12 @@ function createUuid() {
   return globalThis.crypto?.randomUUID?.() ?? fallbackUuid();
 }
 
+function normalizeSystemPrompt(value) {
+  if (value === null || value === undefined) return null;
+  const text = String(value).trim();
+  return text ? text : null;
+}
+
 function formatTime(value) {
   if (!value) return "";
   return new Intl.DateTimeFormat("zh-CN", {
@@ -694,7 +700,7 @@ function App() {
   const [systemPrompt, setSystemPrompt] = useState(() => {
     if (typeof window === "undefined") return null;
     const stored = window.localStorage.getItem(SYSTEM_PROMPT_STORAGE_KEY);
-    return stored === null ? null : stored;
+    return normalizeSystemPrompt(stored);
   });
   const [systemPromptModalOpen, setSystemPromptModalOpen] = useState(false);
 
@@ -908,9 +914,14 @@ function App() {
           initialValue={systemPrompt ?? ""}
           onClose={() => setSystemPromptModalOpen(false)}
           onSave={(value) => {
-            setSystemPrompt(value);
+            const normalizedValue = normalizeSystemPrompt(value);
+            setSystemPrompt(normalizedValue);
             if (typeof window !== "undefined") {
-              window.localStorage.setItem(SYSTEM_PROMPT_STORAGE_KEY, value);
+              if (normalizedValue === null) {
+                window.localStorage.removeItem(SYSTEM_PROMPT_STORAGE_KEY);
+              } else {
+                window.localStorage.setItem(SYSTEM_PROMPT_STORAGE_KEY, normalizedValue);
+              }
             }
             setSystemPromptModalOpen(false);
           }}

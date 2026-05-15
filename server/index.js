@@ -24,10 +24,11 @@ function createUuid() {
 
 function resolveCompareRequest(body) {
   const prompt = String(body.prompt ?? "").trim();
-  const systemPrompt =
+  const rawSystemPrompt =
     body.systemPrompt === undefined || body.systemPrompt === null
       ? undefined
       : String(body.systemPrompt);
+  const systemPrompt = rawSystemPrompt?.trim() ? rawSystemPrompt.trim() : undefined;
   const modelSelections = Array.isArray(body.modelSelections)
     ? body.modelSelections
     : Array.isArray(body.modelIds)

@@ -1,6 +1,4 @@
 const REQUEST_TIMEOUT_MS = 90_000;
-const DEFAULT_SYSTEM_PROMPT =
-  "你正在参与一个多模型横向对比。请直接回答用户问题，结构清晰，避免提及其他模型。";
 
 function buildThinkingPayload(modelConfig, thinkingOption) {
   if (!thinkingOption) {
@@ -140,13 +138,11 @@ function buildMessages(input, systemPrompt) {
         }
       ];
 
-  const effectiveSystemPrompt =
-    systemPrompt === undefined ? DEFAULT_SYSTEM_PROMPT : systemPrompt;
   const messages = [];
-  if (effectiveSystemPrompt) {
+  if (typeof systemPrompt === "string" && systemPrompt.trim()) {
     messages.push({
       role: "system",
-      content: effectiveSystemPrompt
+      content: systemPrompt.trim()
     });
   }
   messages.push(...userMessages);
