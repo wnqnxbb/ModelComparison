@@ -4,9 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "concurrently -n api,ui -c blue,green \"node server/index.js\" \"vite --host 127.0.0.1\"",
+    "dev": "concurrently -n api,ui -c blue,green \"node server/index.js\" \"vite --host 0.0.0.0 --port 6663\"",
     "server": "node server/index.js",
-    "client": "vite --host 127.0.0.1",
+    "client": "vite --host 0.0.0.0 --port 6663",
     "build": "vite build",
     "start": "NODE_ENV=production node server/index.js"
   },
