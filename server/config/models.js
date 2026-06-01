@@ -152,7 +152,6 @@ export const MODEL_CATALOG = [
     thinkingParameterStyle: "openai-reasoning-effort",
     thinkingOptions: OPENAI_GPT55_THINKING_OPTIONS,
     defaultThinkingOptionId: "medium",
-    usesMaxCompletionTokens: true,
     supportsStreamOptionsUsage: true,
     pricing: {
       currency: USD,

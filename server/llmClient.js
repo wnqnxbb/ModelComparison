@@ -35,14 +35,6 @@ function buildThinkingPayload(modelConfig, thinkingOption) {
   return {};
 }
 
-function buildTokenLimitPayload(modelConfig) {
-  if (modelConfig.usesMaxCompletionTokens) {
-    return { max_completion_tokens: 4096 };
-  }
-
-  return { max_tokens: 4096 };
-}
-
 function normalizeContent(content) {
   if (typeof content === "string") return content;
   if (Array.isArray(content)) {
@@ -154,7 +146,6 @@ function buildChatBody(modelConfig, input, thinkingOption, stream, systemPrompt)
     model: modelConfig.model,
     messages: buildMessages(input, systemPrompt),
     stream,
-    ...buildTokenLimitPayload(modelConfig),
     ...buildThinkingPayload(modelConfig, thinkingOption)
   };
 
