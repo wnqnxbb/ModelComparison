@@ -147,7 +147,7 @@ export const MODEL_CATALOG = [
     provider: "openai-compatible",
     model: "gpt-5.5",
     apiKey: API_KEYS.gpt55,
-    baseUrl: "http://10.2.131.13:6661/v1",
+    baseUrl: "https://icoe.pp.ua/v1",
     path: "/chat/completions",
     thinkingParameterStyle: "openai-reasoning-effort",
     thinkingOptions: OPENAI_GPT55_THINKING_OPTIONS,
