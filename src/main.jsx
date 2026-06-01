@@ -3,6 +3,8 @@ import { createRoot } from "react-dom/client";
 import {
   ChevronDown,
   CircleAlert,
+  Check,
+  Copy,
   Loader2,
   MessageSquarePlus,
   Send,
@@ -10,6 +12,8 @@ import {
   Sparkles,
   X
 } from "lucide-react";
+import { copyResultContent } from "./clipboard.js";
+import { formatDuration } from "./formatters.js";
 import "./styles.css";
 
 const EMPTY_STATE_TEXT = "准备好了，随时开始";
@@ -259,12 +263,14 @@ async function readSseStream(response, onEvent) {
 }
 
 function UsageLine({ result }) {
-  if (!result.usage && !result.cost) return null;
+  const duration = formatDuration(result.latencyMs);
+  if (!result.usage && !result.cost && !duration) return null;
   const pieces = [
     result.usage?.prompt_tokens ? `输入 ${result.usage.prompt_tokens}` : "",
     result.usage?.completion_tokens ? `输出 ${result.usage.completion_tokens}` : "",
     result.usage?.total_tokens ? `合计 ${result.usage.total_tokens}` : "",
-    result.cost ? `费用 ${formatMoney(result.cost)}` : ""
+    result.cost ? `费用 ${formatMoney(result.cost)}` : "",
+    duration ? `总耗时 ${duration}` : ""
   ].filter(Boolean);
   if (pieces.length === 0) return null;
   return <span>{pieces.join(" / ")}</span>;
@@ -537,8 +543,22 @@ function ResultCard({ result, fallbackThinkingLabel }) {
   const success = result.status === "success";
   const loading = result.status === "loading";
   const errored = result.status === "error";
+  const [copied, setCopied] = useState(false);
+  const copyDisabled = !result.content;
   const thinkingLabel = result.thinkingOption?.label ?? fallbackThinkingLabel;
   const meta = [providerLabel(result.provider), thinkingLabel].filter(Boolean).join(" · ");
+
+  async function copyContent() {
+    if (copyDisabled) return;
+    try {
+      await copyResultContent(result);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1400);
+    } catch (error) {
+      console.error("复制失败", error);
+    }
+  }
+
   return (
     <article className={`result-card ${errored ? "error" : ""} ${loading ? "loading" : ""}`}>
       <header className="result-header">
@@ -546,16 +566,28 @@ function ResultCard({ result, fallbackThinkingLabel }) {
           <div className="model-name">{result.modelName}</div>
           <div className="model-provider">{meta}</div>
         </div>
-        <span className={`status-pill ${success ? "ok" : errored ? "bad" : "pending"}`}>
-          {success ? `${Math.max(1, Math.round(result.latencyMs / 1000))}s` : null}
-          {errored ? "失败" : null}
-          {loading ? (
-            <>
-              <Loader2 size={13} className="spin" />
-              <span>输出中</span>
-            </>
-          ) : null}
-        </span>
+        <div className="result-actions">
+          <button
+            type="button"
+            className={`copy-result-button ${copied ? "copied" : ""}`}
+            disabled={copyDisabled}
+            onClick={copyContent}
+            aria-label={copied ? "已复制正文" : "复制正文"}
+            title={copied ? "已复制正文" : "复制正文"}
+          >
+            {copied ? <Check size={15} /> : <Copy size={15} />}
+          </button>
+          <span className={`status-pill ${success ? "ok" : errored ? "bad" : "pending"}`}>
+            {success ? `${Math.max(1, Math.round(result.latencyMs / 1000))}s` : null}
+            {errored ? "失败" : null}
+            {loading ? (
+              <>
+                <Loader2 size={13} className="spin" />
+                <span>输出中</span>
+              </>
+            ) : null}
+          </span>
+        </div>
       </header>
 
       {!errored ? (
