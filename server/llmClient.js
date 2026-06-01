@@ -1,4 +1,6 @@
-const REQUEST_TIMEOUT_MS = 90_000;
+import { inspect } from "node:util";
+
+export const REQUEST_TIMEOUT_MS = 10 * 60 * 1000;
 
 function buildThinkingPayload(modelConfig, thinkingOption) {
   if (!thinkingOption) {
@@ -103,6 +105,19 @@ function extractErrorMessage(payload, fallback) {
   if (typeof payload.error?.message === "string") return payload.error.message;
   if (typeof payload.message === "string") return payload.message;
   return fallback;
+}
+
+function formatErrorDetails(error) {
+  if (error?.name === "AbortError") return "请求超时";
+  if (error instanceof Error || (error && typeof error === "object")) {
+    return inspect(error, {
+      colors: false,
+      depth: null,
+      maxArrayLength: null,
+      maxStringLength: null
+    });
+  }
+  return String(error);
 }
 
 async function readJsonResponse(response) {
@@ -246,7 +261,7 @@ export async function callModel(modelConfig, input, thinkingOption, systemPrompt
       error: null
     };
   } catch (error) {
-    const message = error.name === "AbortError" ? "请求超时" : error.message;
+    const message = formatErrorDetails(error);
     return {
       ...emptyResult(modelConfig, thinkingOption, "error"),
       latencyMs: Date.now() - startedAt,
@@ -342,7 +357,7 @@ export async function callModelStream(modelConfig, input, thinkingOption, onDelt
     result.cost = calculateCost(modelConfig, result.usage);
     return result;
   } catch (error) {
-    const message = error.name === "AbortError" ? "请求超时" : error.message;
+    const message = formatErrorDetails(error);
     return {
       ...emptyResult(modelConfig, thinkingOption, "error"),
       latencyMs: Date.now() - startedAt,

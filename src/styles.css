@@ -375,6 +375,11 @@ button {
   font-size: 14px;
 }
 
+.error-box span {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
 .composer-shell {
   position: absolute;
   left: 0;
