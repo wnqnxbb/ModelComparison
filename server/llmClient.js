@@ -102,7 +102,20 @@ export function calculateCost(modelConfig, usage) {
 function extractErrorMessage(payload, fallback) {
   if (!payload || typeof payload !== "object") return fallback;
   if (typeof payload.error === "string") return payload.error;
-  if (typeof payload.error?.message === "string") return payload.error.message;
+
+  // 当网关返回结构化错误体（带 type/code 等附加字段）时，保留完整的原始错误，
+  // 便于排查上游问题（如 bad_response_status_code）。仅当错误体确实只有 message
+  // 这一个有用字段时，才降级为纯字符串。
+  const errorObj = payload.error;
+  if (errorObj && typeof errorObj === "object") {
+    const keys = Object.keys(errorObj);
+    const hasExtraField = keys.some((key) => key !== "message");
+    if (hasExtraField) {
+      return JSON.stringify(errorObj);
+    }
+    if (typeof errorObj.message === "string") return errorObj.message;
+  }
+
   if (typeof payload.message === "string") return payload.message;
   return fallback;
 }
@@ -306,7 +319,11 @@ export async function callModelStream(modelConfig, input, thinkingOption, onDelt
     if (!response.ok) {
       const payload = await readJsonResponse(response);
       const message = extractErrorMessage(payload, `${response.status} ${response.statusText}`);
-      throw new Error(message);
+      return {
+        ...emptyResult(modelConfig, thinkingOption, "error"),
+        latencyMs: Date.now() - startedAt,
+        error: message
+      };
     }
 
     const decoder = new TextDecoder();

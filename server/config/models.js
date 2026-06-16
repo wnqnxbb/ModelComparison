@@ -3,7 +3,7 @@ import "dotenv/config";
 const API_KEYS = {
   deepseek: process.env.DEEPSEEK_API_KEY ?? "",
   bigmodel: process.env.BIGMODEL_API_KEY ?? "",
-  gpt55: process.env.GPT55_API_KEY ?? ""
+  sohu: process.env.SOHU_API_KEY ?? ""
 };
 
 const DEEPSEEK_THINKING_OPTIONS = [
@@ -48,7 +48,7 @@ const GLM_THINKING_OPTIONS = [
   }
 ];
 
-const OPENAI_GPT55_THINKING_OPTIONS = [
+const SOHU_GPT55_THINKING_OPTIONS = [
   {
     id: "none",
     label: "None",
@@ -144,13 +144,13 @@ export const MODEL_CATALOG = [
   {
     id: "gpt-5.5",
     name: "GPT-5.5",
-    provider: "openai-compatible",
+    provider: "panther",
     model: "gpt-5.5",
-    apiKey: API_KEYS.gpt55,
-    baseUrl: "https://icoe.pp.ua/v1",
+    apiKey: API_KEYS.sohu,
+    baseUrl: "https://aix.panther.sohurdc.com/v1",
     path: "/chat/completions",
     thinkingParameterStyle: "openai-reasoning-effort",
-    thinkingOptions: OPENAI_GPT55_THINKING_OPTIONS,
+    thinkingOptions: SOHU_GPT55_THINKING_OPTIONS,
     defaultThinkingOptionId: "medium",
     supportsStreamOptionsUsage: true,
     pricing: {
@@ -160,6 +160,84 @@ export const MODEL_CATALOG = [
       cachedInput: 0.5,
       output: 30
     }
+  },
+  {
+    id: "minimax-m3",
+    name: "MiniMax-M3",
+    provider: "panther",
+    model: "MiniMax-M3",
+    apiKey: API_KEYS.sohu,
+    baseUrl: "https://aix.panther.sohurdc.com/v1",
+    path: "/chat/completions",
+    thinkingParameterStyle: null,
+    thinkingOptions: [],
+    defaultThinkingOptionId: null,
+    supportsStreamOptionsUsage: true
+  },
+  {
+    id: "claude-opus-4-6",
+    name: "Claude Opus 4.6",
+    provider: "panther",
+    model: "claude-opus-4-6",
+    apiKey: API_KEYS.sohu,
+    baseUrl: "https://aix.panther.sohurdc.com/v1",
+    path: "/chat/completions",
+    thinkingParameterStyle: null,
+    thinkingOptions: [],
+    defaultThinkingOptionId: null,
+    supportsStreamOptionsUsage: true
+  },
+  {
+    id: "claude-opus-4-7",
+    name: "Claude Opus 4.7",
+    provider: "panther",
+    model: "claude-opus-4-7",
+    apiKey: API_KEYS.sohu,
+    baseUrl: "https://aix.panther.sohurdc.com/v1",
+    path: "/chat/completions",
+    thinkingParameterStyle: null,
+    thinkingOptions: [],
+    defaultThinkingOptionId: null,
+    supportsStreamOptionsUsage: true
+  },
+  {
+    id: "claude-opus-4-8",
+    name: "Claude Opus 4.8",
+    provider: "panther",
+    model: "claude-opus-4-8",
+    apiKey: API_KEYS.sohu,
+    baseUrl: "https://aix.panther.sohurdc.com/v1",
+    path: "/chat/completions",
+    thinkingParameterStyle: null,
+    thinkingOptions: [],
+    defaultThinkingOptionId: null,
+    supportsStreamOptionsUsage: true
+  },
+  {
+    id: "gemini-3-pro-preview",
+    name: "Gemini 3 Pro Preview",
+    provider: "panther",
+    model: "gemini-3-pro-preview",
+    apiKey: API_KEYS.sohu,
+    baseUrl: "https://aix.panther.sohurdc.com/v1",
+    path: "/chat/completions",
+    thinkingParameterStyle: null,
+    thinkingOptions: [],
+    defaultThinkingOptionId: null,
+    supportsStreamOptionsUsage: true
+  },
+  {
+    id: "gemini-3.1-pro-preview",
+    name: "Gemini 3.1 Pro Preview",
+    provider: "panther",
+    model: "gemini-3.1-pro-preview",
+    apiKey: API_KEYS.sohu,
+    baseUrl: "https://aix.panther.sohurdc.com/v1",
+    path: "/chat/completions",
+    thinkingParameterStyle: null,
+    thinkingOptions: [],
+    defaultThinkingOptionId: null,
+    supportsStreamOptionsUsage: true
   }
 ];
 

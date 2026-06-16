@@ -86,6 +86,10 @@ function providerLabel(provider) {
   if (provider === "deepseek") return "DeepSeek";
   if (provider === "bigmodel") return "智谱";
   if (provider === "openai-compatible") return "OpenAI 兼容";
+  if (provider === "minimax") return "MiniMax";
+  if (provider === "anthropic") return "Anthropic";
+  if (provider === "google") return "Google";
+  if (provider === "panther") return "Panther";
   return provider;
 }
 
@@ -426,7 +430,7 @@ function ModelPicker({
                 />
                 <span>
                   <strong>{model.name}</strong>
-                  <small>{providerLabel(model.provider)}</small>
+                  <small>供应商：{providerLabel(model.provider)}</small>
                 </span>
               </button>
               {checked && model.thinkingOptions?.length ? (
@@ -539,6 +543,27 @@ function Composer({
   );
 }
 
+function formatErrorForDisplay(errorMessage) {
+  if (!errorMessage || typeof errorMessage !== "string") return "请求失败";
+
+  // 尝试解析 JSON 格式的错误
+  try {
+    const parsed = JSON.parse(errorMessage);
+    if (parsed && typeof parsed === "object") {
+      // 提取关键信息，优先显示 message
+      const parts = [];
+      if (parsed.message) parts.push(parsed.message);
+      if (parsed.type) parts.push(`类型: ${parsed.type}`);
+      if (parsed.code) parts.push(`代码: ${parsed.code}`);
+      return parts.length > 0 ? parts.join(" | ") : JSON.stringify(parsed, null, 2);
+    }
+  } catch {
+    // 不是 JSON，直接返回原始消息
+  }
+
+  return errorMessage;
+}
+
 function ResultCard({ result, fallbackThinkingLabel }) {
   const success = result.status === "success";
   const loading = result.status === "loading";
@@ -609,7 +634,7 @@ function ResultCard({ result, fallbackThinkingLabel }) {
       ) : (
         <div className="error-box">
           <CircleAlert size={18} />
-          <span>{result.error || "请求失败"}</span>
+          <span>{formatErrorForDisplay(result.error)}</span>
         </div>
       )}
     </article>
